@@ -171,7 +171,7 @@ d. On top of the previous object, add the layer that produces the main plots (th
 
 ```{r bar_gg, eval=TRUE}
 plot1 = base + geom_bar(fill ="gray",
-                        stat = 'identity') 
+                        stat = 'identity') # notice the "stat"
 plot1
 ```
 
@@ -473,21 +473,49 @@ table(eduwa$High.Grade,exclude = 'nothing')
 Being a categorical variable, the default option is again the bar plot. So let's prepare the frequency table as a data frame:
 
 ```{r tableAsDF, eval=TRUE}
-frqTabO=as.data.frame(prop.table(table(eduwa$High.Grade)))
-names(frqTabO)=c('grade','pct')
-frqTabO
+gradesTbFreq=as.data.frame(prop.table(table(eduwa$High.Grade)))
+names(gradesTbFreq)=c('grade','pct')
+gradesTbFreq
 ```
 
 Notice that have previously set the right data type for this variable. Now, we can use ggplot:
 
 ```{r ordTable_gg, eval=TRUE}
 
-base = ggplot(frqTabO,aes(x=grade,y=pct))
+base = ggplot(data= gradesTbFreq,
+              aes(x=grade,y=pct))
 base + geom_bar(stat = 'identity') 
 ```
 
 
-The x-values in this variable have **order**. That is, there is an increasing level in the values. Whenever we have an ordering, besides *concentration* we can visualize **asymmetry**: if there is bias towards lower or higher values. 
+The x-values in this variable have **order**, so I should not _reorder_ the horizontal. What about highlighting?
+
+```{r}
+base = ggplot(gradesTbFreq,
+              aes(x=grade,y=pct)) 
+# fill color based on condition
+barGrades=base + geom_bar(stat = 'identity',
+                          aes(fill=pct>0.3)) 
+# customize colors to use:
+barGrades + scale_fill_manual(values=c("black","green"))
+```
+Or just the axis labels?
+
+```{r}
+# the top grades
+gradesTop=gradesTbFreq[gradesTbFreq$pct>0.3,"grade"]
+# the color for the top grades
+TextAxisColor=ifelse(gradesTbFreq$grade%in%gradesTop,"red","grey")
+
+# prepare
+base = ggplot(gradesTbFreq,aes(x=grade,y=pct)) 
+barGrades=base + geom_bar(stat = 'identity') 
+
+# change the horizontal axis defaults
+barGrades + theme(axis.text.x = element_text(color=TextAxisColor,size=9))
+```
+
+That is, there is an increasing level in the values. Whenever we have an ordering, besides *concentration* we can visualize **asymmetry**: if there is bias towards lower or higher values. 
 
 Bar plots help you see concentration and symmetry, but we have an alternative way to clearly detect departure from perfect symmetry, via **boxplots**:
 
@@ -529,7 +557,7 @@ _____
 <a id='part3'></a>
 
 
-# LAB for THURSDAY: From numeric to ordinal
+# LAB for THURSDAY: From numeric to ordinal via intervals
 
 
 The variable "Free Lunch"  is telling you how many students receive lunch in a school. If you request a summary you get:
@@ -561,13 +589,13 @@ pie(table(eduwa$Free.LunchGroup))
 ```
 
 
-Please, prepare for Thursday:
+Please, prepare for Thursday one of these:
 
 - A **barplot** for the ordinal version of _Free.Lunch_ variable.
 
 - A **boxplot** for the ordinal version of _Free.Lunch_ variable.
 
-
+**Do you have data of your own and would like to prepare one of these? You are welcome to do it!**
 
 _____
 
