@@ -23,7 +23,9 @@ Contents:
 
 _____
 
-
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy()
+```
 
 # Introduction
 
