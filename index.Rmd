@@ -17,14 +17,14 @@ Contents:
 
 2. [Ordinal Data.](#part2) 
 
-3. [LAB (next meeting).](#part3) 
+3. [LAB 02 (next meeting).](#part3) 
 
 
 
 _____
 
 ```{r klippy, echo=FALSE, include=TRUE}
-klippy::klippy()
+klippy::klippy(position = c('top', 'right'))
 ```
 
 # Introduction
@@ -62,7 +62,7 @@ names(eduwa)
 
 
 
-Whatever your visual goals are, you first need to know **how** that variable you are planing to use has been recognised in R:
+Whatever your visual goals are, you first need to know **how** that variable you are planing to use has been recognized in R:
 
 ```{r dataSTR, eval=TRUE}
 # this 'width = 70,strict.width='cut' means
@@ -193,7 +193,26 @@ plot2
 
 ```
 
-* Add the reference lines: Let's use the percent column and annotate to show a particular value.
+If you prefer a subtitle to be added:
+
+```{r title_gg2, eval=TRUE}
+titleText='Where are Public Schools located?'
+sub_titleText='Washington State - 2019'
+sourceText='Source: US Department of Education'
+# are these obvious?
+x.AxisText="Locations"
+y.AxisText="Percent"
+
+plot2 = plot1 + labs(title=titleText,
+                     subtitle = sub_titleText,
+                     x =NULL, 
+                     y = NULL,
+                     caption = sourceText) 
+plot2
+
+```
+
+* Add the reference lines: Let's use the _percent_ column and annotate to show a particular value.
 
 ```{r refl_gg1, eval=TRUE}
 base= ggplot(data = tableFreq, 
@@ -278,7 +297,7 @@ plot2 = plot1 + labs(title=titleText,
                      caption = sourceText)
 plot3 = plot2 + geom_hline(yintercept = 25, 
                            linetype="dashed", 
-                           size=1.5, 
+                           linewidth=1.5, 
                            alpha=0.5)
 plot4 = plot3 + scale_y_continuous(breaks=c(0,25,50),
                                  limits = c(0, 50),
@@ -447,7 +466,9 @@ lolliplot7= lolliplot6 + theme(legend.position = c(0.8,0.4),
                                legend.background = element_rect(fill='grey95'))
 lolliplot7 
 ```
+
 What about this:
+
 
 ```{r zeroLineAsAXisLabel, eval=TRUE}
 lolliplot8 = lolliplot7 +  geom_label(aes(label=Locale),
@@ -500,7 +521,10 @@ barGrades=base + geom_bar(stat = 'identity',
                           aes(fill=pct>0.3)) 
 # customize colors to use:
 barGrades + scale_fill_manual(values=c("black","green"))
+
 ```
+
+
 Or just the axis labels?
 
 ```{r}
