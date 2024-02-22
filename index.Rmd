@@ -201,18 +201,18 @@ sub_titleText='Washington State - 2019'
 sourceText='Source: US Department of Education'
 # are these obvious?
 x.AxisText="Locations"
-y.AxisText="Percent"
+y.AxisText="Count"
 
 plot2 = plot1 + labs(title=titleText,
                      subtitle = sub_titleText,
-                     x =NULL, 
-                     y = NULL,
+                     x =NULL,  #x.AxisText
+                     y = NULL, #y.AxisText
                      caption = sourceText) 
 plot2
 
 ```
 
-* Add the reference lines: Let's use the _percent_ column and annotate to show a particular value.
+* Add the reference lines: Let's use the _percent_ column this time instead od the counts, and annotate with a line to show a relevant value (just picking _25_).
 
 ```{r refl_gg1, eval=TRUE}
 base= ggplot(data = tableFreq, 
