@@ -151,7 +151,7 @@ tableFreq
 ```
 
 
-This data frame has the three columns, we will use second for our bars.
+This data frame has the three columns, we will use the second for our bars.
 
 b. Call the library (you may need  to install it first):
 
@@ -212,7 +212,7 @@ plot2
 
 ```
 
-* Add the reference lines: Let's use the _percent_ column this time instead od the counts, and annotate with a line to show a relevant value (just picking _25_).
+* Add the reference lines: Let's use the _percent_ column this time instead of the counts, and annotate with a line to show a relevant value (just picking _25_).
 
 ```{r refl_gg1, eval=TRUE}
 base= ggplot(data = tableFreq, 
@@ -377,7 +377,7 @@ tableFreq
 ```
 
 
-That will the **color** in **aes**:
+We can add **color** in **aes**:
 ```{r lolli_gg_color, eval=TRUE}
 
 # add new aesthetics 'color'
@@ -462,7 +462,7 @@ Moving the legend within the plot area:
 
 ```{r moveLengendLolli, eval=TRUE}
 
-lolliplot7= lolliplot6 + theme(legend.position = c(0.8,0.4),
+lolliplot7= lolliplot6 + theme(legend.position.inside = c(0.8,0.4),
                                legend.background = element_rect(fill='grey95'))
 lolliplot7 
 ```
@@ -583,45 +583,27 @@ _____
 <a id='part3'></a>
 
 
-# LAB for THURSDAY: From numeric to ordinal via intervals
+# First Deliverable (Option 1)
 
 
-The variable "Free Lunch"  is telling you how many students receive lunch in a school. If you request a summary you get:
+Prepare a plot for the column **LocaleSub**, but just for one kind of _locale_.
+For example, you know we have:
 
-```{r summaryNumerical, eval=TRUE}
-summary(eduwa$Free.Lunch)
+```{r}
+table(eduwa$LocaleType)
 ```
-
-Then, when you see the minimum and max value, you can create groups by **cutting** the variable:
-
-```{r cuttingNumerical, eval=TRUE}
-theCuts=c(0,100, 250, 500,750,1000,2000)
-theCutsLabels=c("100 and below","101-250","251-500",
-                "501-750","751-1000","1001 and above")
-
-eduwa$Free.LunchGroup=cut(eduwa$Free.Lunch,
-                          breaks = theCuts,
-                          labels = theCutsLabels)
+In this case, you keep one (your choice):
+```{r}
+cityEduwa=eduwa[eduwa$LocaleType=='City',]
+table(cityEduwa$LocaleSub)
 ```
+Notice that LocaleSub is a factor, now with unused levels. You should drop the unused levels:
+```{r}
+cityEduwa$LocaleSub=droplevels(cityEduwa$LocaleSub)
 
-This new variable has this table:
-```{r tableNumOrdinal, eval=TRUE}
-table(eduwa$Free.LunchGroup)
+# you start from here
+table(cityEduwa$LocaleSub)
 ```
-
-You known that a pie plot looks like this:
-```{r piePlotLab,fig.height=6}
-pie(table(eduwa$Free.LunchGroup))
-```
-
-
-Please, prepare for Thursday one of these:
-
-- A **barplot** for the ordinal version of _Free.Lunch_ variable.
-
-- A **boxplot** for the ordinal version of _Free.Lunch_ variable.
-
-**Do you have data of your own and would like to prepare one of these? You are welcome to do it!**
 
 _____
 
