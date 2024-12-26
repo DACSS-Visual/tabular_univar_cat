@@ -1,2 +1,2 @@
 # tabular_univar_cat
-Session on univariate categorical data
+[univariate categorical data](https://dacss-visual.github.io/tabular_univar_cat/)
