@@ -24,6 +24,7 @@ Contents:
 _____
 
 ```{r klippy, echo=FALSE, include=TRUE}
+# remotes::install_github("rlesur/klippy")
 klippy::klippy(position = c('top', 'right'))
 ```
 
@@ -31,7 +32,7 @@ klippy::klippy(position = c('top', 'right'))
 
 These first codes will use a table structure. When data is in tabular format, cases are organized in rows, while variables (information about the cases) are organized in columns. Almost every data you have used in a spreadsheet follows that structure. 
 
-For example, when you visit the [website](https://nces.ed.gov/ccd/) of the Common Core of Data from the US Department of Education, you can get a data set with detailed information on public schools from the whole US. Let me get a data table I have prepared with schools from the State of Washington:
+For example, when you visit the [website](https://nces.ed.gov/ccd/schoolsearch/) of the National Center for Education Statistics from the US Department of Education, you can get a data set with detailed information on public schools from the whole US. Let me get a data table I have prepared with schools from the State of Washington:
 
 
 
@@ -62,7 +63,7 @@ names(eduwa)
 
 
 
-Whatever your visual goals are, you first need to know **how** that variable you are planing to use has been recognized in R:
+Whatever your visual goals are, you first need to know **how** that variable you are planning to use has been recognized in R:
 
 ```{r dataSTR, eval=TRUE}
 # this 'width = 70,strict.width='cut' means
@@ -73,7 +74,7 @@ str(eduwa,width = 70,strict.width='cut')
 
 You see different data types in the result: **num** (numbers in R when decimal values are detected).  The ones that say **chr** are strings. You see several variables identified as _factor_ or _ordered factor_, which are categorical variables. This is how many you have for each data type.
 
-```{r coun_datatypes}
+```{r count_datatypes}
 table(unlist(sapply(eduwa, class)))
 
 ```
@@ -100,7 +101,7 @@ You can not get a clear idea of what a data table has, so a simple **frequency t
 ```{r freqTab_abs, eval=TRUE}
 # absolute values
 absoluteT=table(eduwa$LocaleType,
-                exclude = 'nothing') #include all values!
+                 useNA = "ifany") #include all values!
 #here you are:
 absoluteT
 ```
@@ -108,6 +109,8 @@ We should try using all the information possible, then it is a good idea to _lab
 
 ```{r nameNA, eval=TRUE}
 names(absoluteT)[5]='Unknown'
+### what about?
+# names(absoluteT)[is.na(names(absoluteT))] <- 'Unknown'
 ```
 
 The absolute count can be transformed into percent or relative frequencies:
@@ -172,8 +175,8 @@ base= ggplot(data = tableFreq,
 d. On top of the previous object, add the layer that produces the main plots (the next layers will add or customize elements in the plot):
 
 ```{r bar_gg, eval=TRUE}
-plot1 = base + geom_bar(fill ="gray",
-                        stat = 'identity') # notice the "stat"
+plot1 = base + geom_col()
+# geom_bar(stat = 'identity') # alternative
 plot1
 ```
 
@@ -219,8 +222,7 @@ base= ggplot(data = tableFreq,
              aes(x = Locale,
                  y = Percent)) 
 
-plot1 = base + geom_bar(fill ="gray",
-                        stat = 'identity') 
+plot1 = base + geom_col(fill ="gray") 
 
 plot2 = plot1 + labs(title=titleText,
                      x =NULL, 
@@ -233,6 +235,18 @@ plot3 = plot2 + geom_hline(yintercept = 25, #where
                            alpha=0.5) #transparency
 plot3
 ```
+
+### *Why 25%?* 
+
+> In real analysis, you'd pick a reference based on:
+
+> - Policy benchmarks (e.g., "state average = 22%")
+> - Research thresholds (e.g., "urban definition: >25% density")
+> - Comparative baselines (e.g., national average)
+>
+> *Here, we use 25% simply to demonstrate the **technique** of adding reference lines. 
+> In your own work, always justify your benchmarks!*
+
 
 * Customize the vertical axes:
 
@@ -289,8 +303,7 @@ base= ggplot(data = tableFreq,
              aes(x = reorder(Locale,Percent),y = Percent)) 
 base= base + theme_classic()
 ##
-plot1 = base + geom_bar(fill ="gray",
-                        stat = 'identity') 
+plot1 = base + geom_col(fill ="gray") 
 plot2 = plot1 + labs(title=titleText,
                      x =NULL, 
                      y = NULL,
@@ -342,7 +355,7 @@ lolliplot2
 
 
 
-And, what about changing the axis values so that we can identify the gaps:
+And, what about changing the axis values so that we can identify the gaps (using 25 as the reference as before):
 
 ```{r prepareGaps, eval=TRUE}
 # new variable
@@ -356,7 +369,8 @@ That will be our new **y** in **aes**:
 base = ggplot(tableFreq, aes(x=reorder(Locale,Percent),
                              y=gap)) #change
 base = base + theme_classic()
-#base = base + scale_x_discrete(limits=localesOrd)
+
+####
 
 lolliplot1=base + geom_segment(aes(y = 0,
                                    yend = gap, #change
@@ -364,11 +378,12 @@ lolliplot1=base + geom_segment(aes(y = 0,
                                    xend = reorder(Locale,Percent)), 
                                color = "gray") 
 lolliplot2 = lolliplot1 + geom_point()
+
 lolliplot2 
 
 ```
 
-Maybe add some color, for that we need to create a new categorical column:
+Maybe add some color, for that we need to create a new categorical column to **tableFreq** data frame:
 
 ```{r colorGapType, eval=TRUE}
 # a new column for color
@@ -385,7 +400,6 @@ base = ggplot(tableFreq, aes(x=reorder(Locale,Percent),
                              y=gap,
                              color=PositiveGap))#here 
 base = base + theme_classic()
-#base= base + scale_x_discrete(limits=localesOrd)
 
 lolliplot1=base + geom_segment(aes(y = 0, 
                                    yend = gap, 
@@ -407,7 +421,6 @@ base = ggplot(tableFreq, aes(x=reorder(Locale,Percent),y=gap,
                              label = round(gap,3))) #label
 
 base = base + theme_classic()
-#base= base + scale_x_discrete(limits=localesOrd)
 
 lolliplot1=base + geom_segment(aes(y = 0, yend = gap, 
                                    x = reorder(Locale,Percent), 
@@ -419,7 +432,7 @@ lolliplot2=lolliplot1 + geom_point()
 lolliplot2 + geom_text() 
 ```
 
-You can avoid the overlaping symbols in the legend by using:
+You should make  labels visible, and also  avoid the overlaping symbols in the legend (get rid of that redundancy):
 
 ```{r nudge_gg1, eval=TRUE}
 lolliplot3= lolliplot2 + geom_text(nudge_x=0.3,#to the right
@@ -490,7 +503,7 @@ lolliplot8
 For this section, we will use the variable that tells us the highest grade offered in a school. A simple exploration gives:
 
 ```{r ordinalTable, eval=TRUE}
-table(eduwa$High.Grade,exclude = 'nothing')
+table(eduwa$High.Grade,useNA = "ifany")
 ```
 
 Being a categorical variable, the default option is again the bar plot. So let's prepare the frequency table as a data frame:
@@ -507,7 +520,7 @@ Notice that have previously set the right data type for this variable. Now, we c
 
 base = ggplot(data= gradesTbFreq,
               aes(x=grade,y=pct))
-base + geom_bar(stat = 'identity') 
+base + geom_col() 
 ```
 
 
@@ -517,10 +530,9 @@ The x-values in this variable have **order**, so I should not _reorder_ the hori
 base = ggplot(gradesTbFreq,
               aes(x=grade,y=pct)) 
 # fill color based on condition
-barGrades=base + geom_bar(stat = 'identity',
-                          aes(fill=pct>0.3)) 
-# customize colors to use:
-barGrades + scale_fill_manual(values=c("black","green"))
+barGrades=base + geom_col(aes(fill=pct>0.3)) 
+# customize colors to use (are they a ggod choice?):
+barGrades + scale_fill_manual(values=c("yellow","green"))
 
 ```
 
@@ -535,10 +547,10 @@ TextAxisColor=ifelse(gradesTbFreq$grade%in%gradesTop,"red","grey")
 
 # prepare
 base = ggplot(gradesTbFreq,aes(x=grade,y=pct)) 
-barGrades=base + geom_bar(stat = 'identity') 
+barGrades2=base + geom_col() 
 
 # change the horizontal axis defaults
-barGrades + theme(axis.text.x = element_text(color=TextAxisColor,size=9))
+barGrades2 + theme(axis.text.x = element_text(color=TextAxisColor,size=9))
 ```
 
 That is, there is an increasing level in the values. Whenever we have an ordering, besides *concentration* we can visualize **asymmetry**: if there is bias towards lower or higher values. 
@@ -575,6 +587,12 @@ Box plots have important statistical information. The beginning and the ending o
 
 _____
 
+## 🔑 Key Takeaways
+- **Nominal data**: Use bar/lollipop plots; order bars by value for clarity
+- **Ordinal data**: Preserve natural order; consider boxplots to show asymmetry
+- **Always**: Label missing values explicitly; test colors for accessibility
+- **Reference lines**: Only add when you have a meaningful benchmark
+
 
 [Go to table of contents.](#part0)
 
@@ -583,27 +601,103 @@ _____
 <a id='part3'></a>
 
 
-# First Deliverable (Option 1)
+# BONUS MATERIAL: Color blindness tests
+
+We have prepared several plots, and the colors shown have been the default ones, or I have manually selected some colors. While you become savvy on choosing right colors, you could start exploring the library **colorblindr** (read documentation to install the package [here](https://github.com/clauswilke/colorblindr)).
+
+This package offers to replot your viz showing it as if you have colorblindness.
+
+See some of our plots:
+
+```{r, echo=FALSE}
+# remotes::install_github("wilkelab/cowplot")
+# install.packages("colorspace", repos = "http://R-Forge.R-project.org")
+# remotes::install_github("clauswilke/colorblindr")
+
+```
+
+This case uses default colors:
+```{r, message=FALSE}
+library(colorblindr)
+cvd_grid(lolliplot8)
+```
+
+> 🔍 **Reading `cvd_grid()` output**:
+> 
+> Our goal: the visualization should remain interpretable in **all four panels**!
+> 
+> - **Deutanomaly**: Most common red-green colorblindness (~5% of males)
+> - **Protanomaly**: Red-green deficiency (~1% of males)  
+> - **Tritanomaly**: Blue-yellow deficiency (rare)
+> - **Desaturated**: Simulates grayscale vision—critical for B&W printing, photocopying, and viewers with reduced color sensitivity
 
 
-Prepare a plot for the column **LocaleSub**, but just for one kind of _locale_.
-For example, you know we have:
+This case I selected the colors manually:
+```{r}
+
+cvd_grid(barGrades + scale_fill_manual(values=c("yellow","green")))
+```
+
+Try an alternative?
+```{r}
+cvd_grid(barGrades + scale_fill_manual(values=c("grey70", "#0072B2")))
+```
+Check the use of safe palettes:
+
+- Brewer
+```{r}
+barGrades_brewer1=barGrades + 
+  scale_fill_brewer(palette = "Set2",
+                    name = "High enrollment\n(>30%)")
+barGrades_brewer1
+```
+
 
 ```{r}
-table(eduwa$LocaleType)
+cvd_grid(barGrades_brewer1)
 ```
-In this case, you keep one (your choice):
 ```{r}
-cityEduwa=eduwa[eduwa$LocaleType=='City',]
-table(cityEduwa$LocaleSub)
+barGrades_brewer2 <- barGrades + 
+  scale_fill_brewer(palette = "Paired",
+                    name = "High enrollment\n(>30%)")
+barGrades_brewer2
 ```
-Notice that LocaleSub is a factor, now with unused levels. You should drop the unused levels:
 ```{r}
-cityEduwa$LocaleSub=droplevels(cityEduwa$LocaleSub)
+cvd_grid(barGrades_brewer2)
 
-# you start from here
-table(cityEduwa$LocaleSub)
 ```
+
+### ColorBrewer Palette Quick Reference
+
+| Purpose | Recommended Palette | Colorblind-Safe? |
+|---------|--------------------|-----------------|
+| **Categorical (2-8 groups)** | `Set2`, `Dark2`, `Paired` | ✅ Yes |
+| **Categorical (many groups)** | `Set3`, `Accent` | ✅ Yes |
+| **Sequential (low→high)** | `Blues`, `Greys`, `Purples` | ✅ Yes |
+| **Diverging (low↔high)** | `RdBu`, `PiYG` | ✅ Yes |
+| **Diverging (avoid!)** | `RdYlGn`, `BrBG` | ❌ No (red-green) |
+
+You may use **colorblindr**  library to manually select colors.
+
+
+<!-- Prepare a plot for the column **LocaleSub**, but just for one kind of _locale_. -->
+<!-- For example, you know we have: -->
+
+<!-- ```{r} -->
+<!-- table(eduwa$LocaleType) -->
+<!-- ``` -->
+<!-- In this case, you keep one (your choice): -->
+<!-- ```{r} -->
+<!-- cityEduwa=eduwa[eduwa$LocaleType=='City',] -->
+<!-- table(cityEduwa$LocaleSub) -->
+<!-- ``` -->
+<!-- Notice that LocaleSub is a factor, now with unused levels. You should drop the unused levels: -->
+<!-- ```{r} -->
+<!-- cityEduwa$LocaleSub=droplevels(cityEduwa$LocaleSub) -->
+
+<!-- # you start from here -->
+<!-- table(cityEduwa$LocaleSub) -->
+<!-- ``` -->
 
 _____
 
