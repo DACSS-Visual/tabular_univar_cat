@@ -642,6 +642,7 @@ Try an alternative?
 ```{r}
 cvd_grid(barGrades + scale_fill_manual(values=c("grey70", "#0072B2")))
 ```
+
 Check the use of safe palettes:
 
 - Brewer
